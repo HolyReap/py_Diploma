@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:14.3-alpine3.15
+    ports:
+      - "5431:5432"
+    container_name: pgdb
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB}
+      PGDATA: ${PG_DATA}
+
+  django:
+    build: .
+    container_name: django
+    volumes:
+      - .:/orders
+    ports: 
+      - 8000:8000
+    depends_on:
+      - db

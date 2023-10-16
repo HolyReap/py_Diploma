@@ -1,0 +1,192 @@
+# Примеры API-запросов
+
+@baseURL = http://127.0.0.1:8000/api/v1 
+
+### Регистрация нового пользователя
+POST {{baseURL}}/user/register
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Smith",
+  "email": "pdiplom-user-asv@yandex.ru",
+  "password": "Pass123wor456_d",
+  "password_confirmation": "Pass123wor456_d",
+  "company": "none",
+  "position": "buyer",
+  "type": "buyer"
+}
+
+### Подтверждение почтового адреса. Токен отправляется на почту при создании учетки
+POST {{baseURL}}/user/register/confirm
+Content-Type: application/json
+
+{
+  "email": "pdiplom-user-asv@yandex.ru",
+  "token": "6fa11abf6fc609da416195dea615d4023c724e4c87967"
+}
+
+### Авторизация пользователя
+POST {{baseURL}}/user/login
+Content-Type: application/json
+
+{
+  "email": "pdiplom-user-asv@yandex.ru",
+  "password": "Pass123wor456_d"
+}
+
+### В переменной указать токен, полученный в предыдещем запросе
+@UserToken1 = 3121ee3101b4995be12fa75e095e6851e8c2226f
+
+### Создать контакт пользователя
+POST {{baseURL}}/user/contact/
+Authorization: Token {{UserToken1}}
+Content-Type: application/json
+
+{
+  "city": "Москва",
+  "street": "Кутузовская",
+  "house": "1",
+  "floor": "1",
+  "apartment": "1",
+  "phone": "+71234567890"
+}
+
+### Список всех контактов пользователя
+GET {{baseURL}}/user/contact/
+Authorization: Token {{UserToken1}}
+
+### В переменной указать ID контакта для использования в дальнейших запросах
+@ContactId = 1
+
+### Получение контакта пользователя по ID
+GET {{baseURL}}/user/contact/{{ContactId}}/
+Authorization: Token {{UserToken1}}
+
+### Редактирование контакта пользователя по ID
+PUT {{baseURL}}/user/contact/{{ContactId}}/
+Authorization: Token {{UserToken1}}
+Content-Type: application/json
+
+{
+  "city": "Москва",
+  "street": "Кутузовская",
+  "house": "5",
+  "floor": "10",
+  "apartment": "98",
+  "phone": "+71234567890"
+}
+
+### Удаление контакта пользователя по ID
+DELETE {{baseURL}}/user/contact/{{ContactId}}/
+Authorization: Token {{UserToken1}}
+
+### Получение информации о пользователе
+GET {{baseURL}}/user/details
+Authorization: Token {{UserToken1}}
+
+### Редактирование информации о пользователе
+PATCH {{baseURL}}/user/details
+Authorization: Token {{UserToken1}}
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "company": "Company",
+  "type": "shop"
+}
+
+### Загрузка данных магазина по ссылке
+POST {{baseURL}}/partner/update/url
+Authorization: Token {{UserToken1}}
+Content-Type: application/json
+
+{
+  "url": "https://github.com/HolyReap/python-final-diplom/tree/master/data/shop1.yaml"
+}
+
+### Загрузка данных магазина из файла
+POST {{baseURL}}/partner/update/file
+Authorization: Token {{UserToken1}}
+
+### Переменная - ID магазина для использования в запросах 
+@PartnerId1 = 1
+
+### Получение информации о статусе магазина по ID, прочие параметры магазина
+GET {{baseURL}}/partner/state/{{PartnerId1}}
+Authorization: Token {{UserToken1}}
+
+### Редактирование информации о статусе магазина и прочих параметров по ID
+PUT {{baseURL}}/partner/state/{{PartnerId1}}
+Authorization: Token {{UserToken1}}
+Content-Type: application/json
+
+{
+  "state": true
+}
+
+### Получение списка категорий
+GET {{baseURL}}/categories
+
+### Получение списка магазинов, принимающих заказы (только State = True)
+GET {{baseURL}}/shops
+
+### Получение списка товаров
+GET {{baseURL}}/products
+
+@CategoryID = 224
+
+### Получение списка товаров по ID категории
+GET {{baseURL}}/products?category_id={{CategoryID}}
+
+### Добавить товар в корзину
+POST {{baseURL}}/basket
+Authorization: Token {{UserToken1}}
+Content-Type:application/json
+
+{
+  "items": [
+    {
+      "product_info": 4,
+      "quantity": 2
+    }
+  ]
+}
+
+### Изменить товары в корзине
+PUT {{baseURL}}/basket
+Authorization: Token {{UserToken1}}
+Content-Type:application/json
+
+{
+  "items": [
+    {
+      "product_info": 2,
+      "quantity": 2
+    }
+  ]
+}
+
+### Получить содержимое корзины
+GET {{baseURL}}/basket
+Authorization: Token {{UserToken1}}
+
+### Удалить содержимое корзины
+DELETE {{baseURL}}/basket
+Authorization: Token {{UserToken1}}
+
+### Разместить заказ из корзины
+POST {{baseURL}}/order
+Authorization: Token {{UserToken1}}
+Content-Type:application/json
+
+{
+  "id": 2,
+  "contact": 1
+}
+
+
+### Получить список заказов
+GET {{baseURL}}/order
+Authorization: Token {{UserToken1}}
