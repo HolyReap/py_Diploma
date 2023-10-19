@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "email": "pdiplom-user-asv@yandex.ru",
-  "token": "6fa11abf6fc609da416195dea615d4023c724e4c87967"
+  "token": "546501666ac63e3e46e58f4dd839156f81541d"
 }
 
 ### Авторизация пользователя
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### В переменной указать токен, полученный в предыдещем запросе
-@UserToken1 = 3121ee3101b4995be12fa75e095e6851e8c2226f
+@UserToken1 = ceac2ca1615b029e25df985168f8625fab53d554
 
 ### Создать контакт пользователя
 POST {{baseURL}}/user/contact/
@@ -71,7 +71,7 @@ Content-Type: application/json
 {
   "city": "Москва",
   "street": "Кутузовская",
-  "house": "5",
+  "house": "",
   "floor": "10",
   "apartment": "98",
   "phone": "+71234567890"
@@ -148,7 +148,7 @@ Content-Type:application/json
 {
   "items": [
     {
-      "product_info": 4,
+      "product_info": 5,
       "quantity": 2
     }
   ]
@@ -162,7 +162,7 @@ Content-Type:application/json
 {
   "items": [
     {
-      "product_info": 2,
+      "product_info": 6,
       "quantity": 2
     }
   ]
@@ -182,11 +182,16 @@ Authorization: Token {{UserToken1}}
 Content-Type:application/json
 
 {
-  "id": 2,
-  "contact": 1
+  "id": 3,
+  "contact": 2
 }
 
 
 ### Получить список заказов
 GET {{baseURL}}/order
+Authorization: Token {{UserToken1}}
+
+
+### Получить список заказов поставщиком
+GET {{baseURL}}/partner/orders
 Authorization: Token {{UserToken1}}

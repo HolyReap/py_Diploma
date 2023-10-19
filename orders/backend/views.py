@@ -15,7 +15,6 @@ import yaml
 
 from backend.models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter,\
     ConfirmEmailToken, Contact, Order, OrderItem
-#from backend.signals import new_user_registered, new_order
 
 from backend.serializers import NewAccountSerializer, AccountConfirmationSerializer, \
     AccountLoginSerializer, AccountContactSerializer, AccountSerializer, PartnerUpdateSerializer, \
@@ -36,7 +35,7 @@ class RegisterAccountView(APIView):
         serializer = NewAccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            #new_user_registered.send(sender=self.__class__, user_id=user.id)
+            # new_user_registered.send(sender=self.__class__, user_id=user.id)
             token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user.id)
             response = {
                 "status": "Success",
@@ -331,7 +330,7 @@ class OrderView(APIView):
             order.save()
             # new_order.send(sender=self.__class__, user_id=request.user.id)
             return Response(
-                {"status": "Success", "message": "Заказ размещен"},
+                {"status": "Success", "message": "Спасибо за заказ"},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

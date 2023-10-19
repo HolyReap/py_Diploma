@@ -251,6 +251,34 @@ class OrderConfirmationSerializer(serializers.Serializer):
                     "error": "Указан не корректный контакт",
                 }
             )
+        if not contact.city:
+            raise serializers.ValidationError(
+                {
+                    "status": "Failure",
+                    "error": "Не указан город в адресе",
+                }
+            )
+        if not contact.street:
+            raise serializers.ValidationError(
+                {
+                    "status": "Failure",
+                    "error": "Не указана улица в адресе",
+                }
+            )
+        if not contact.house and not contact.structure and not contact.building:
+            raise serializers.ValidationError(
+                {
+                    "status": "Failure",
+                    "error": "Не указан номер здания в адресе",
+                }
+            )
+        if not contact.phone:
+            raise serializers.ValidationError(
+                {
+                    "status": "Failure",
+                    "error": "Не указан номер телефона",
+                }
+            )
         if not order:
             raise serializers.ValidationError(
                 {"status": "Failure", "error": "Указан не корректный заказ"}

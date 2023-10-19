@@ -87,14 +87,14 @@ WSGI_APPLICATION = 'orders.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("PG_DB"),
-        'HOST': '127.0.0.1',
-        'PORT': env("PG_PORT"),
-        'USER': env("PG_USER"),
-        'PASSWORD': env("PG_PASSWORD"),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': env("PG_DB"),
+        # 'HOST': env("PG_HOST"),
+        # 'PORT': env("PG_PORT"),
+        # 'USER': env("PG_USER"),
+        # 'PASSWORD': env("PG_PASSWORD"),
     }
 }
 
@@ -143,7 +143,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = env("EMAIL_HOST")
 EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 EMAIL_USE_SSL = env("EMAIL_USE_SSL")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
