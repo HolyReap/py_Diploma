@@ -1,34 +1,21 @@
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver, Signal
 from backend.models import ConfirmEmailToken, User
 from django_rest_passwordreset.signals import reset_password_token_created
+from django.core.mail import send_mail
 
-new_user_registered = Signal(
-   # providing_args=['user_id'],
-)
 
-new_order = Signal(
-   # providing_args=['user_id'],
-)
+def new_user_registered_mail(user):
+    """Отправка письма с подтверждением регистрации"""
 
-@receiver(new_user_registered)
-def new_user_registered_signal(user_id, **kwargs):
-    """
-    отправляем письмо с подтрердждением почты
-    """
-    # send an e-mail to the user
-    token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user_id)
+    token, _ = ConfirmEmailToken.objects.get_or_create(user=user)
 
-    msg = EmailMultiAlternatives(
-        # title:
-        f"Password Reset Token for {token.user.email}",
-        # message:
-        token.key,
-        # from:
-        settings.EMAIL_HOST_USER,
-        # to:
-        [token.user.email]
+    send_mail(
+        subject="Подтверждение регистрации пользователя",
+        message=f"Ключ для подтверждения регистрации - {token.key}",
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user.email],
+        fail_silently=False,
     )
-    msg.send()
+
 

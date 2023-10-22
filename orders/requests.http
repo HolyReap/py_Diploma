@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "email": "pdiplom-user-asv@yandex.ru",
-  "token": "546501666ac63e3e46e58f4dd839156f81541d"
+  "token": "109c4bc7f63b10b652968e44661c8c5f7c655ed95478"
 }
 
 ### Авторизация пользователя
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### В переменной указать токен, полученный в предыдещем запросе
-@UserToken1 = ceac2ca1615b029e25df985168f8625fab53d554
+@UserToken1 = 0366d1a80e3e3a4fe796501d304b3fae38ce2c43
 
 ### Создать контакт пользователя
 POST {{baseURL}}/user/contact/
@@ -71,7 +71,7 @@ Content-Type: application/json
 {
   "city": "Москва",
   "street": "Кутузовская",
-  "house": "",
+  "house": "5",
   "floor": "10",
   "apartment": "98",
   "phone": "+71234567890"
@@ -103,7 +103,7 @@ Authorization: Token {{UserToken1}}
 Content-Type: application/json
 
 {
-  "url": "https://github.com/HolyReap/python-final-diplom/tree/master/data/shop1.yaml"
+  "url": "https://raw.githubusercontent.com/HolyReap/python-final-diplom/master/data/shop1.yaml"
 }
 
 ### Загрузка данных магазина из файла
@@ -148,7 +148,7 @@ Content-Type:application/json
 {
   "items": [
     {
-      "product_info": 5,
+      "product_info": 2,
       "quantity": 2
     }
   ]
@@ -162,7 +162,7 @@ Content-Type:application/json
 {
   "items": [
     {
-      "product_info": 6,
+      "product_info": 1,
       "quantity": 2
     }
   ]
@@ -177,13 +177,13 @@ DELETE {{baseURL}}/basket
 Authorization: Token {{UserToken1}}
 
 ### Разместить заказ из корзины
-POST {{baseURL}}/order
+POST {{baseURL}}/order/confirm
 Authorization: Token {{UserToken1}}
 Content-Type:application/json
 
 {
-  "id": 3,
-  "contact": 2
+  "id": 4,
+  "contact": 1
 }
 
 

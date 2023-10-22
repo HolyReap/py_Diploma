@@ -236,7 +236,12 @@ class OrderConfirmationSerializer(serializers.Serializer):
         contact = Contact.objects.filter(Q(user_id=user.id) & Q(id=contact_id)).first()
         order = Order.objects.filter(Q(id=order_id) & Q(user_id=user.id)).first()
         state = order.state
+        order.contact = contact
 
+        if not order:
+            raise serializers.ValidationError(
+                {"status": "Failure", "error": "Указан не корректный заказ"}
+            )
         if not state == 'basket':
             raise serializers.ValidationError(
                 {
@@ -244,7 +249,7 @@ class OrderConfirmationSerializer(serializers.Serializer):
                     "error": "Не корректный статус заказа",
                 }
             )
-        if not contact:
+        if not order.contact:
             raise serializers.ValidationError(
                 {
                     "status": "Failure",
@@ -278,9 +283,5 @@ class OrderConfirmationSerializer(serializers.Serializer):
                     "status": "Failure",
                     "error": "Не указан номер телефона",
                 }
-            )
-        if not order:
-            raise serializers.ValidationError(
-                {"status": "Failure", "error": "Указан не корректный заказ"}
             )
         return order

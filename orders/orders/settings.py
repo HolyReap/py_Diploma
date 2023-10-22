@@ -28,12 +28,12 @@ environ.Env.read_env(os.path.join(BASE_DIR,".env"))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("DJ_ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
@@ -87,14 +87,14 @@ WSGI_APPLICATION = 'orders.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # 'ENGINE': 'django.db.backends.postgresql',
-        # 'NAME': env("PG_DB"),
-        # 'HOST': env("PG_HOST"),
-        # 'PORT': env("PG_PORT"),
-        # 'USER': env("PG_USER"),
-        # 'PASSWORD': env("PG_PASSWORD"),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.environ.get("PG_ENGINE", "django.db.backends.sqlite3"),
+        'NAME': os.environ.get("PG_DB", BASE_DIR / "db.sqlite3"),
+        'HOST': os.environ.get("PG_HOST", "localhost"),
+        'PORT': os.environ.get("PG_PORT", "5432"),
+        'USER': os.environ.get("PG_USER", "user"),
+        'PASSWORD': os.environ.get("PG_PASSWORD", "password"),
     }
 }
 
@@ -140,12 +140,13 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'backend.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_TLS = True
 
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_USE_SSL = env("EMAIL_USE_SSL")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 SERVER_EMAIL = EMAIL_HOST_USER
 
 # Default primary key field type

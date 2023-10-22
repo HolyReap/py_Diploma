@@ -22,7 +22,7 @@ from backend.serializers import NewAccountSerializer, AccountConfirmationSeriali
     OrderSerializer, OrderConfirmationSerializer
 from backend.filters import ProductFilter
 from backend.permissions import UserIsOwner, UserIsShop
-from backend.signals import new_user_registered, new_order
+from backend.signals import new_user_registered_mail
 
 class RegisterAccountView(APIView):
     """
@@ -36,6 +36,7 @@ class RegisterAccountView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             # new_user_registered.send(sender=self.__class__, user_id=user.id)
+            new_user_registered_mail(user)
             token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user.id)
             response = {
                 "status": "Success",
@@ -307,7 +308,7 @@ class BasketView(APIView):
 
 class OrderView(APIView):
     """
-    Класс для получения и размешения заказов пользователями
+    Класс для получения заказов пользователями
     """
     permission_classes = [IsAuthenticated]
     serializer_class = OrderSerializer
@@ -321,7 +322,15 @@ class OrderView(APIView):
         serializer = OrderSerializer(order, many=True)
         return Response(serializer.data)
 
+
+class OrderViewConfirm(APIView):
+    """
+    Класс для размешения заказов пользователями
+    """
     # разместить заказ из корзины
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderConfirmationSerializer
+    
     def post(self, request, *args, **kwargs):
         serializer = OrderConfirmationSerializer(data=request.data, context={"request": request})
         if serializer.is_valid(raise_exception=True):

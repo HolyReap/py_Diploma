@@ -1,24 +1,26 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  django:
+  orders:
     build: .
-    container_name: django
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/orders
+      - ./orders/:/user/src/orders
     ports: 
       - 8000:8000
+    env_file:
+      - ./.env
     depends_on:
       - db
-    network_mode: host
 
   db:
-    image: postgres:14.3-alpine3.15
-    ports:
-      - "5432:5432"
-    container_name: pgdb
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: ${PG_DB}
-      PGDATA: ${PG_DATA}
+
+volumes:
+  postgres_data:

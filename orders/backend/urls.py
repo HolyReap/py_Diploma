@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from backend.views import RegisterAccountView, ConfirmAccountView, LoginAccountView, ContactView, \
     AccountDetails, PartnerUpdateURL, PartnerUpdateFILE, PartnerState, CategoryView, ShopView, \
-    ProductInfoView, BasketView, OrderView, PartnerOrders
+    ProductInfoView, BasketView, OrderView, OrderViewConfirm, PartnerOrders
 
 app_name = 'backend'
 
@@ -24,5 +24,6 @@ urlpatterns = [
     path('products', ProductInfoView.as_view(), name='products'),
     path('basket', BasketView.as_view(), name='basket'),
     path('order', OrderView.as_view(), name='order'),
+    path('order/confirm', OrderViewConfirm.as_view(), name='order'),
     path('', include(router.urls)),
 ]
