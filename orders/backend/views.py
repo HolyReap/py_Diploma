@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from yaml import load as SafeLoader
+from yaml import load as load_yaml, Loader
 import yaml
 
 from backend.models import User, Shop, Category, Product, ProductInfo, Parameter, ProductParameter,\
@@ -22,7 +22,8 @@ from backend.serializers import NewAccountSerializer, AccountConfirmationSeriali
     OrderSerializer, OrderConfirmationSerializer
 from backend.filters import ProductFilter
 from backend.permissions import UserIsOwner, UserIsShop
-from backend.signals import new_user_registered_mail
+from backend.signals import new_user_registered_mail, new_order_created_mail, new_order_notify
+
 
 class RegisterAccountView(APIView):
     """
@@ -35,7 +36,6 @@ class RegisterAccountView(APIView):
         serializer = NewAccountSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            # new_user_registered.send(sender=self.__class__, user_id=user.id)
             new_user_registered_mail(user)
             token, _ = ConfirmEmailToken.objects.get_or_create(user_id=user.id)
             response = {
@@ -88,7 +88,6 @@ class ContactView(ModelViewSet):
     """
     Класс для работы с контактами покупателей
     """
-
     queryset = Contact.objects.prefetch_related()
     serializer_class = AccountContactSerializer
     permission_classes = [IsAuthenticated, UserIsOwner]
@@ -115,6 +114,7 @@ class AccountDetails(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class PartnerUpdateURL(APIView):
     permission_classes = [IsAuthenticated, UserIsShop]
@@ -129,35 +129,40 @@ class PartnerUpdateURL(APIView):
         url = serializer.validated_data.get("url")
         try:
             stream = get(url).content
-            data = yaml.load(stream, Loader=SafeLoader)
-        except Exception as error:
-            print(error)
-            return Response(
-                {"status": "Failure", "error": "Ошибка загрузки данных"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+            data = load_yaml(stream, Loader=Loader)
+        except yaml.YAMLError as exc:
+                print(exc)
+                return Response(
+                        {"status": "Failure", "error": "Ошибка загрузки по ссылке"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                
         shop, _ = Shop.objects.get_or_create(name=data["shop"], user_id=request.user.id)
+
         for category in data["categories"]:
-            category_object, _ = Category.objects.get_or_create(id=category["id"], name=category["name"])
+            category_object, _ = Category.objects.get_or_create(
+                id=category["id"], name=category["name"]
+            )
             category_object.shops.add(shop.id)
             category_object.save()
+
         ProductInfo.objects.filter(shop_id=shop.id).delete()
+
         for item in data["goods"]:
             product, _ = Product.objects.get_or_create(name=item["name"], category_id=item["category"])
             product_info = ProductInfo.objects.create(
-                                                      product_id=product.id, external_id=item["id"],
+                                                      product_id=product.id,external_id=item["id"],
                                                       model=item["model"], price=item["price"],
                                                       price_rrc=item["price_rrc"],
                                                       quantity=item["quantity"], shop_id=shop.id,
-                                                     )
+                                                      )
             for name, value in item["parameters"].items():
                 parameter_object, _ = Parameter.objects.get_or_create(name=name)
                 ProductParameter.objects.create(
                                                 product_info_id=product_info.id,
                                                 parameter_id=parameter_object.id,
                                                 value=value,
-                                               )
+                                                )
         return Response(
             {"status": "Success", "message": "Данные загружены"},
             status=status.HTTP_200_OK,
@@ -237,6 +242,20 @@ class ShopView(ListAPIView):
   
     
 class ProductInfoView(ListAPIView):
+    """
+    Класс для поиска товаров
+    """
+    queryset = (
+        ProductInfo.objects.select_related("shop", "product__category")
+        .prefetch_related("product_parameters__parameter")
+        .distinct()
+    )
+    
+    serializer_class = ProductInfoSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
+    
+class ProductInfoViewID(ModelViewSet):
     """
     Класс для поиска товаров
     """
@@ -334,10 +353,12 @@ class OrderViewConfirm(APIView):
     def post(self, request, *args, **kwargs):
         serializer = OrderConfirmationSerializer(data=request.data, context={"request": request})
         if serializer.is_valid(raise_exception=True):
+            user = request.user
             order = serializer.validated_data
             order.state = "new"
             order.save()
-            # new_order.send(sender=self.__class__, user_id=request.user.id)
+            new_order_created_mail(user)
+            new_order_notify(user, order.id)
             return Response(
                 {"status": "Success", "message": "Спасибо за заказ"},
                 status=status.HTTP_200_OK,

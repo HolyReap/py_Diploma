@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "email": "pdiplom-user-asv@yandex.ru",
-  "token": "109c4bc7f63b10b652968e44661c8c5f7c655ed95478"
+  "token": "8a6d219e40d6158c9420c"
 }
 
 ### Авторизация пользователя
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### В переменной указать токен, полученный в предыдещем запросе
-@UserToken1 = 0366d1a80e3e3a4fe796501d304b3fae38ce2c43
+@UserToken1 = cb8abd75ba6fb3d1675026abe924739d32b65688
 
 ### Создать контакт пользователя
 POST {{baseURL}}/user/contact/
@@ -136,9 +136,12 @@ GET {{baseURL}}/shops
 GET {{baseURL}}/products
 
 @CategoryID = 224
-
 ### Получение списка товаров по ID категории
 GET {{baseURL}}/products?category_id={{CategoryID}}
+
+@ProductID = 224
+### Получение данных товара по ID
+GET {{baseURL}}/product/id/{{ProductID}}
 
 ### Добавить товар в корзину
 POST {{baseURL}}/basket
@@ -182,7 +185,7 @@ Authorization: Token {{UserToken1}}
 Content-Type:application/json
 
 {
-  "id": 4,
+  "id": 2,
   "contact": 1
 }
 
@@ -195,3 +198,7 @@ Authorization: Token {{UserToken1}}
 ### Получить список заказов поставщиком
 GET {{baseURL}}/partner/orders
 Authorization: Token {{UserToken1}}
+
+
+### mail
+POST {{baseURL}}/mail
