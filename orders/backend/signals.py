@@ -30,12 +30,12 @@ def new_order_created_mail(user):
         fail_silently=False,
     )
     
-def new_order_notify(user, order_id):
+def new_order_notify(user, order, sum):
     """Отправка письма о заказе админу"""
 
     send_mail(
         subject="Пользователь разместил заказ",
-        message=f"Пользователь {user.email} разместил заказ ID = {order_id} в магазине",
+        message=f"Пользователь {user.email} разместил заказ ID = {order.id} на сумму {sum} руб. c доставкой по адресу {order.contact}",
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[settings.EMAIL_HOST_USER],
         fail_silently=False,

@@ -3,7 +3,7 @@ version: '3.8'
 services:
   orders:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: "gunicorn -c gunicorn.py orders.wsgi"
     volumes:
       - ./orders/:/user/src/orders
     ports: 
@@ -21,6 +21,18 @@ services:
       POSTGRES_USER: ${PG_USER}
       POSTGRES_PASSWORD: ${PG_PASSWORD}
       POSTGRES_DB: ${PG_DB}
+
+  nginx:
+    restart: always
+    image: nginx
+    expose:
+      - 8080
+    ports:
+      - "80:8080"
+    volumes:
+      - ./nginx:/user/src/orders/nginx/conf.d
+    depends_on:
+      - orders
 
 volumes:
   postgres_data:

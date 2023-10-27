@@ -2,7 +2,7 @@
 
 @baseURL = http://127.0.0.1:8000/api/v1 
 
-### Регистрация нового пользователя
+### Регистрация нового пользователя. Необходимо указать e-mail, на который отправится код подтверждения
 POST {{baseURL}}/user/register
 Content-Type: application/json
 
@@ -23,7 +23,7 @@ Content-Type: application/json
 
 {
   "email": "pdiplom-user-asv@yandex.ru",
-  "token": "8a6d219e40d6158c9420c"
+  "token": "98f207be6f501b724b60b9969d1df5b8438ac76e105a49651a"
 }
 
 ### Авторизация пользователя
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### В переменной указать токен, полученный в предыдещем запросе
-@UserToken1 = cb8abd75ba6fb3d1675026abe924739d32b65688
+@UserToken1 = d38d4b781a118aa4b17e6ff8b84e40a0ec72f5a4
 
 ### Создать контакт пользователя
 POST {{baseURL}}/user/contact/
@@ -179,14 +179,18 @@ Authorization: Token {{UserToken1}}
 DELETE {{baseURL}}/basket
 Authorization: Token {{UserToken1}}
 
+### Переменные - ID заказа и ID контакта для оформления заказа
+@cartID=23
+@contactID=1
+
 ### Разместить заказ из корзины
 POST {{baseURL}}/order/confirm
 Authorization: Token {{UserToken1}}
 Content-Type:application/json
 
 {
-  "id": 2,
-  "contact": 1
+  "id": {{cartID}},
+  "contact": {{contactID}}
 }
 
 
@@ -198,7 +202,3 @@ Authorization: Token {{UserToken1}}
 ### Получить список заказов поставщиком
 GET {{baseURL}}/partner/orders
 Authorization: Token {{UserToken1}}
-
-
-### mail
-POST {{baseURL}}/mail

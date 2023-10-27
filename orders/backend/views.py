@@ -310,7 +310,7 @@ class BasketView(APIView):
         order.delete()
         return Response(
             {"status": "Success", "message": "Товары удалены из корзины"},
-            status=status.HTTP_204_NO_CONTENT,
+            status=status.HTTP_200_OK,
         )
 
     # редактировать корзину
@@ -353,12 +353,18 @@ class OrderViewConfirm(APIView):
     def post(self, request, *args, **kwargs):
         serializer = OrderConfirmationSerializer(data=request.data, context={"request": request})
         if serializer.is_valid(raise_exception=True):
+            basket = (Order.objects.filter(user=self.request.user, state="basket")
+                    .prefetch_related("ordered_items")
+                    .annotate(total_sum=Sum(F("ordered_items__quantity") * F("ordered_items__product_info__price"))
+                             ).first()
+                 )
+            response = OrderSerializer(basket)
             user = request.user
             order = serializer.validated_data
             order.state = "new"
             order.save()
             new_order_created_mail(user)
-            new_order_notify(user, order.id)
+            new_order_notify(user, order, response.data["total_sum"])
             return Response(
                 {"status": "Success", "message": "Спасибо за заказ"},
                 status=status.HTTP_200_OK,
